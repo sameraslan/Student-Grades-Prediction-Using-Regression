@@ -9,7 +9,6 @@ from matplotlib import style
 from sklearn.utils import shuffle
 
 data = pd.read_csv("student-mat.csv", sep=";")
-# data = data[["G1", "G2", "G3", "studytime", "failures", "Mjob", "Fjob", "absences"]]
 # data = pd.get_dummies(data = data, drop_first = True)
 
 data['school'] = data['school'].astype('category').cat.codes
@@ -30,13 +29,22 @@ data['internet'] = data['internet'].astype('category').cat.codes
 data['higher'] = data['higher'].astype('category').cat.codes
 data['romantic'] = data['romantic'].astype('category').cat.codes
 
+#Positive correlations above .1 only resulted in best model with .9787 prediction accuracy
+#data = data[["G1", "G2", "G3", "sex", "address", "Medu", "Fedu", "Mjob", "reason", "paid", "higher"]]
+
+#Positive and negative correlations above .1 only resulted in best model with .9726 prediction accuracy
+data = data[["G1", "G2", "G3", "sex", "address", "Medu", "Fedu", "Mjob", "reason", "paid", "higher", 'age', 'traveltime', 'failures', 'romantic', 'goout']]
 predict = 'G3'
 
 # Print out all feature correlations to G3
 counter = 0
 for column in data:
     featureList = list(data.columns)
-    print(str(featureList[counter]) + ": " + str(data[column].corr(data[predict])))
+    correlation = data[column].corr(data[predict])
+    # Prints out correlations above .1 for me to select (neg and pos second time)
+    '''if correlation >= .1 or correlation <= -.1:
+        print(str(featureList[counter]) + ": " + str(correlation))'''
+
     counter = counter + 1
     if counter == len(featureList) - 1:
         break
@@ -47,7 +55,7 @@ x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y
 
 
 bestScore = 0
-for i in range(30):
+for i in range(10000):
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, test_size = 0.1)
 
     linear = linear_model.LinearRegression()
@@ -56,26 +64,27 @@ for i in range(30):
     #print(acc)
 
     if acc > bestScore:
-        with open("studentGradesModel.pickle", "wb") as f:
-            pickle.dump(linear, f)
-        best = acc
+        #Models Saved
+        '''with open("studentGradesNegAndPosPredModel.pickle", "wb") as f:
+            pickle.dump(linear, f)'''
+        bestScore = acc
 
 
-
-pickleInput = open("studentGradesModel.pickle", "rb")
+print(bestScore)
+pickleInput = open("studentGradesNegAndPosPredModel.pickle", "rb")
 linear = pickle.load(pickleInput)
 
 #print('Coefficient: \n', linear.coef_)
 #print('Intercept: \n', linear.intercept_)
 
-predictions = linear.predict(x_test)
+#predictions = linear.predict(x_test)
 
-#for x in range(len(predictions)):
-    #print(predictions[x], x_test[x], y_test[x])
+'''for x in range(len(predictions)):
+    print(predictions[x], x_test[x], y_test[x])'''
 
-p = "G1"
+'''p = "G1"
 style.use("ggplot")
 pyplot.scatter(data[p], data["G3"])
 pyplot.xlabel(p)
 pyplot.ylabel("Final Grade")
-#pyplot.show()
+pyplot.show()'''
