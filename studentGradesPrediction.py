@@ -53,7 +53,7 @@ X = np.array(data.drop([predict], 1))
 y = np.array(data[predict])
 x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, test_size = 0.1)
 
-
+'''
 bestScore = 0
 for i in range(10000):
     x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, test_size = 0.1)
@@ -65,14 +65,16 @@ for i in range(10000):
 
     if acc > bestScore:
         #Models Saved
-        '''with open("studentGradesNegAndPosPredModel.pickle", "wb") as f:
-            pickle.dump(linear, f)'''
+        with open("studentGradesNegAndPosPredModel.pickle", "wb") as f:
+            pickle.dump(linear, f)
         bestScore = acc
+'''
 
-
-print(bestScore)
+#print(bestScore)
 pickleInput = open("studentGradesNegAndPosPredModel.pickle", "rb")
 linear = pickle.load(pickleInput)
+acc = linear.score(x_test, y_test)
+print(acc)
 
 #print('Coefficient: \n', linear.coef_)
 #print('Intercept: \n', linear.intercept_)
